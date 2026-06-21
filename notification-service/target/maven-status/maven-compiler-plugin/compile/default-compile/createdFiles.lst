@@ -1,0 +1,5 @@
+com\aditya\ecommerce\notification\kafka\OrderEventConsumer.class
+com\aditya\ecommerce\notification\service\NotificationService.class
+com\aditya\ecommerce\notification\event\OrderCreatedEvent.class
+com\aditya\ecommerce\notification\event\OrderCreatedEvent$Item.class
+com\aditya\ecommerce\notification\NotificationServiceApplication.class

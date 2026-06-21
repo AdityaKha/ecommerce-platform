@@ -1,0 +1,9 @@
+com\aditya\ecommerce\inventory\event\OrderCreatedEvent$Item.class
+com\aditya\ecommerce\inventory\event\OrderCreatedEvent.class
+com\aditya\ecommerce\inventory\domain\InventoryItem.class
+com\aditya\ecommerce\inventory\repository\InventoryRepository.class
+com\aditya\ecommerce\inventory\kafka\OrderEventConsumer.class
+com\aditya\ecommerce\inventory\controller\InventoryController.class
+com\aditya\ecommerce\inventory\domain\InventoryItem$InventoryItemBuilder.class
+com\aditya\ecommerce\inventory\service\InventoryService.class
+com\aditya\ecommerce\inventory\InventoryServiceApplication.class

@@ -1,0 +1,7 @@
+D:\Code\ecommerce-platform\inventory-service\src\main\java\com\aditya\ecommerce\inventory\controller\InventoryController.java
+D:\Code\ecommerce-platform\inventory-service\src\main\java\com\aditya\ecommerce\inventory\domain\InventoryItem.java
+D:\Code\ecommerce-platform\inventory-service\src\main\java\com\aditya\ecommerce\inventory\event\OrderCreatedEvent.java
+D:\Code\ecommerce-platform\inventory-service\src\main\java\com\aditya\ecommerce\inventory\InventoryServiceApplication.java
+D:\Code\ecommerce-platform\inventory-service\src\main\java\com\aditya\ecommerce\inventory\kafka\OrderEventConsumer.java
+D:\Code\ecommerce-platform\inventory-service\src\main\java\com\aditya\ecommerce\inventory\repository\InventoryRepository.java
+D:\Code\ecommerce-platform\inventory-service\src\main\java\com\aditya\ecommerce\inventory\service\InventoryService.java

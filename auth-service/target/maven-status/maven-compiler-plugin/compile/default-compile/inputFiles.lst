@@ -1,0 +1,12 @@
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\AuthServiceApplication.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\controller\AuthController.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\domain\Role.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\domain\User.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\dto\AuthResponse.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\dto\LoginRequest.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\dto\RegisterRequest.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\exception\GlobalExceptionHandler.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\repository\UserRepository.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\security\JwtUtil.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\security\SecurityConfig.java
+D:\Code\ecommerce-platform\auth-service\src\main\java\com\aditya\ecommerce\auth\service\AuthService.java
