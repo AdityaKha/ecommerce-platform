@@ -1,3 +1,0 @@
-com\aditya\ecommerce\gateway\filter\JwtAuthenticationFilter.class
-com\aditya\ecommerce\gateway\security\JwtUtil.class
-com\aditya\ecommerce\gateway\ApiGatewayApplication.class
