@@ -93,49 +93,13 @@ mvn test
 
 ## Running the Services
 
-Services must be started in this order due to Eureka registration dependencies. Run each in a **separate terminal**.
+Use the VS Code tasks defined in `.vscode/tasks.json`. Open the Command Palette (`Ctrl+Shift+P`) → **Tasks: Run Task** and choose one of:
 
-> **Note:** `mvn` is not on the system PATH. Use the full path to `mvn.cmd` as shown below.
-
-### 1. Discovery Server (Eureka) — port `8761`
-```powershell
-cd D:\Code\ecommerce-platform\discovery-server
-& "C:\Users\khand\.maven\maven-3.9.16\bin\mvn.cmd" spring-boot:run
-```
-Dashboard: http://localhost:8761
-
-### 2. Auth Service — port `8081`
-```powershell
-cd D:\Code\ecommerce-platform\auth-service
-& "C:\Users\khand\.maven\maven-3.9.16\bin\mvn.cmd" spring-boot:run
-```
-
-### 3. API Gateway — port `8080`
-```powershell
-cd D:\Code\ecommerce-platform\api-gateway
-& "C:\Users\khand\.maven\maven-3.9.16\bin\mvn.cmd" spring-boot:run
-```
-
-### 4. Domain Services
-
-Start these in any order after the gateway is up:
-
-```powershell
-cd D:\Code\ecommerce-platform\product-service
-& "C:\Users\khand\.maven\maven-3.9.16\bin\mvn.cmd" spring-boot:run
-```
-```powershell
-cd D:\Code\ecommerce-platform\order-service
-& "C:\Users\khand\.maven\maven-3.9.16\bin\mvn.cmd" spring-boot:run
-```
-```powershell
-cd D:\Code\ecommerce-platform\inventory-service
-& "C:\Users\khand\.maven\maven-3.9.16\bin\mvn.cmd" spring-boot:run
-```
-```powershell
-cd D:\Code\ecommerce-platform\notification-service
-& "C:\Users\khand\.maven\maven-3.9.16\bin\mvn.cmd" spring-boot:run
-```
+| Shortcut | Task | Description |
+|---|---|---|
+| `Ctrl+Shift+B` | **Start All Services** | Starts all services in the correct dependency order, then launches the Angular UI |
+| `Ctrl+Alt+S` | **Stop All Services** | Kills all running Java and Angular processes |
+| `Ctrl+Alt+R` | **Restart All Services** | Runs Stop then Start in sequence |
 
 ---
 

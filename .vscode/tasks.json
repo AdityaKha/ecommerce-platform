@@ -1,0 +1,252 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Discovery Server",
+      "type": "shell",
+      "command": "mvn \"spring-boot:run\"",
+      "options": {
+        "cwd": "${workspaceFolder}/discovery-server"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "close": true
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting DiscoveryServerApplication",
+          "endsPattern": "Tomcat started on port"
+        }
+      }
+    },
+    {
+      "label": "Auth Service",
+      "type": "shell",
+      "command": "mvn \"spring-boot:run\"",
+      "options": {
+        "cwd": "${workspaceFolder}/auth-service"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "close": true
+      },
+      "dependsOn": [
+        "Discovery Server"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting AuthServiceApplication",
+          "endsPattern": "Tomcat started on port"
+        }
+      }
+    },
+    {
+      "label": "API Gateway",
+      "type": "shell",
+      "command": "mvn \"spring-boot:run\"",
+      "options": {
+        "cwd": "${workspaceFolder}/api-gateway"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "close": true
+      },
+      "dependsOn": [
+        "Auth Service"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting ApiGatewayApplication",
+          "endsPattern": "Netty started on port"
+        }
+      }
+    },
+    {
+      "label": "Product Service",
+      "type": "shell",
+      "command": "mvn \"spring-boot:run\"",
+      "options": {
+        "cwd": "${workspaceFolder}/product-service"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "close": true
+      },
+      "dependsOn": [
+        "API Gateway"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting ProductServiceApplication",
+          "endsPattern": "Tomcat started on port"
+        }
+      }
+    },
+    {
+      "label": "Order Service",
+      "type": "shell",
+      "command": "mvn \"spring-boot:run\"",
+      "options": {
+        "cwd": "${workspaceFolder}/order-service"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "close": true
+      },
+      "dependsOn": [
+        "API Gateway"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting OrderServiceApplication",
+          "endsPattern": "Tomcat started on port"
+        }
+      }
+    },
+    {
+      "label": "Inventory Service",
+      "type": "shell",
+      "command": "mvn \"spring-boot:run\"",
+      "options": {
+        "cwd": "${workspaceFolder}/inventory-service"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "close": true
+      },
+      "dependsOn": [
+        "API Gateway"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting InventoryServiceApplication",
+          "endsPattern": "Tomcat started on port"
+        }
+      }
+    },
+    {
+      "label": "Notification Service",
+      "type": "shell",
+      "command": "mvn \"spring-boot:run\"",
+      "options": {
+        "cwd": "${workspaceFolder}/notification-service"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "close": true
+      },
+      "dependsOn": [
+        "API Gateway"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting NotificationServiceApplication",
+          "endsPattern": "Tomcat started on port"
+        }
+      }
+    },
+    {
+      "label": "Angular UI",
+      "type": "shell",
+      "command": "npm start",
+      "options": {
+        "cwd": "${workspaceFolder}/angular-ui"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "close": true
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting Angular",
+          "endsPattern": "Local:\\s+http://localhost"
+        }
+      }
+    },
+    {
+      "label": "Start All Services",
+      "dependsOn": [
+        "Product Service",
+        "Order Service",
+        "Inventory Service",
+        "Notification Service",
+        "Angular UI"
+      ],
+      "dependsOrder": "parallel",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop All Services",
+      "type": "shell",
+      "command": "Get-Process java -ErrorAction SilentlyContinue | Stop-Process -Force; Get-CimInstance Win32_Process -Filter 'name=''node.exe''' | Where-Object { $_.CommandLine -like '*@angular*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }; Write-Host 'All services stopped.'",
+      "presentation": {
+        "panel": "shared",
+        "reveal": "always",
+        "close": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Restart All Services",
+      "dependsOn": [
+        "Stop All Services",
+        "Start All Services"̥̥
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    }
+  ]
+}̥
+̥

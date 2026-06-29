@@ -1,6 +1,9 @@
 # Claude Code AI assistant files
 .claude/
 
+# Angular CLI cache
+.angular/
+
 # Java / Maven build artifacts
 target/
 *.class
