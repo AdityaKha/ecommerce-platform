@@ -1,4 +1,13 @@
 import { Routes } from '@angular/router';
 
-// Routes are configured in Section 2 — see feature/auth/auth.routes.ts
-export const routes: Routes = [];
+export const routes: Routes = [
+  {
+    path: 'home',
+    loadComponent: () => import('./feature/home/home.component').then(m => m.HomeComponent),
+  },
+  {
+    path: 'auth',
+    loadChildren: () => import('./feature/auth/auth.routes').then(m => m.AUTH_ROUTES),
+  },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+];
