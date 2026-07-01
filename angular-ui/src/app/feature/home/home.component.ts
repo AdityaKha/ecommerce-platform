@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../core/services/auth.service';
@@ -7,7 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule],
+  imports: [MatCardModule, MatButtonModule, RouterLink],
   template: `
     <div class="home-container">
       <mat-card class="home-card">
@@ -16,6 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
           <mat-card-subtitle>You are signed in.</mat-card-subtitle>
         </mat-card-header>
         <mat-card-actions>
+          <button mat-stroked-button color="primary" routerLink="/products">View Products</button>
           <button mat-stroked-button color="warn" (click)="logout()">Sign Out</button>
         </mat-card-actions>
       </mat-card>

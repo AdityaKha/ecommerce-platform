@@ -6,6 +6,8 @@ Java-based microservices e-commerce platform built with Spring Boot and Maven. E
 
 **Services:** `api-gateway`, `auth-service`, `discovery-server`, `inventory-service`, `notification-service`, `order-service`, `product-service`
 
+**Frontend:** `angular-ui`
+
 ---
 
 ## Services
@@ -37,6 +39,11 @@ Java-based microservices e-commerce platform built with Spring Boot and Maven. E
 
 ### Notification Service
 - Consumes async events and sends email, SMS, or push notifications.
+
+### Angular UI
+- Single-page client (Angular, standalone components + Material) served on port 4200.
+- Talks only to `api-gateway`; stores the JWT in `localStorage` and attaches it to requests via an HTTP interceptor.
+- Implemented so far: login, registration, and a basic product listing page (`/products`) reading from `product-service`.
 
 ---
 

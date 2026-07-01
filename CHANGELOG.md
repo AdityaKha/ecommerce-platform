@@ -8,6 +8,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+- Product listing page in `angular-ui` (`/products`), fetching from `product-service` via the gateway and rendering a basic table (name, SKU, category, price).
+- "View Products" link on the home screen.
+
 ### Planned
 - Inter-service Kafka/RabbitMQ event bus wiring.
 - Flyway/Liquibase migration scripts per service.
