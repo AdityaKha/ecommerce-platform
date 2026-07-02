@@ -2,6 +2,7 @@ package com.aditya.ecommerce.order.controller;
 
 import com.aditya.ecommerce.order.dto.OrderRequest;
 import com.aditya.ecommerce.order.dto.OrderResponse;
+import com.aditya.ecommerce.order.dto.OrderStatusUpdateRequest;
 import com.aditya.ecommerce.order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,10 @@ public class OrderController {
     @GetMapping
     public List<OrderResponse> findAll() {
         return orderService.findAll();
+    }
+
+    @PatchMapping("/{id}/status")
+    public OrderResponse updateStatus(@PathVariable Long id, @Valid @RequestBody OrderStatusUpdateRequest request) {
+        return orderService.updateStatus(id, request.status());
     }
 }

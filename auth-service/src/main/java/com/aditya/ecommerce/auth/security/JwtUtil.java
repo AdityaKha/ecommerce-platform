@@ -1,6 +1,8 @@
 package com.aditya.ecommerce.auth.security;
 
 import com.aditya.ecommerce.auth.domain.Role;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,5 +44,18 @@ public class JwtUtil {
 
     public long getExpirationMillis() {
         return expirationMillis;
+    }
+
+    public boolean isValid(String token) {
+        try {
+            Jwts.parser().verifyWith(signingKey).build().parseSignedClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public Claims extractClaims(String token) {
+        return Jwts.parser().verifyWith(signingKey).build().parseSignedClaims(token).getPayload();
     }
 }

@@ -1,6 +1,7 @@
 package com.aditya.ecommerce.gateway.filter;
 
 import com.aditya.ecommerce.gateway.security.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Single point of JWT enforcement for the whole platform. Routes in the open list
@@ -23,7 +26,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private static final List<String> OPEN_PATHS = List.of(
             "/api/auth/register",
-            "/api/auth/login"
+            "/api/auth/login",
+            "/api/auth/validate"
     );
 
     private final JwtUtil jwtUtil;
@@ -51,11 +55,21 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             return unauthorized(exchange);
         }
 
+        Claims claims = jwtUtil.extractClaims(token);
         ServerHttpRequest mutatedRequest = request.mutate()
-                .header("X-Auth-Subject", jwtUtil.extractClaims(token).getSubject())
+                .header("X-Auth-Subject", claims.getSubject())
+                .header("X-Auth-Roles", extractRoles(claims))
                 .build();
 
         return chain.filter(exchange.mutate().request(mutatedRequest).build());
+    }
+
+    private String extractRoles(Claims claims) {
+        Object roles = claims.get("roles");
+        if (roles instanceof Collection<?> collection) {
+            return collection.stream().map(String::valueOf).collect(Collectors.joining(","));
+        }
+        return "";
     }
 
     private Mono<Void> unauthorized(ServerWebExchange exchange) {

@@ -3,15 +3,22 @@ package com.aditya.ecommerce.auth.controller;
 import com.aditya.ecommerce.auth.dto.AuthResponse;
 import com.aditya.ecommerce.auth.dto.LoginRequest;
 import com.aditya.ecommerce.auth.dto.RegisterRequest;
+import com.aditya.ecommerce.auth.dto.TokenValidationResponse;
+import com.aditya.ecommerce.auth.dto.UserResponse;
 import com.aditya.ecommerce.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,5 +35,17 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<TokenValidationResponse> validate(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+        return ResponseEntity.ok(authService.validate(token));
+    }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> listUsers() {
+        return authService.listUsers();
     }
 }

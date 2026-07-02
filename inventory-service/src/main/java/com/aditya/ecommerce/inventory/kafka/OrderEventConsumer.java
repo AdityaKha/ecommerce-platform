@@ -1,6 +1,7 @@
 package com.aditya.ecommerce.inventory.kafka;
 
 import com.aditya.ecommerce.inventory.event.OrderCreatedEvent;
+import com.aditya.ecommerce.inventory.exception.InsufficientStockException;
 import com.aditya.ecommerce.inventory.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,10 @@ public class OrderEventConsumer {
     @KafkaListener(topics = "order-events", groupId = "inventory-service")
     public void onOrderCreated(OrderCreatedEvent event) {
         log.info("Reserving stock for order {}", event.orderId());
-        event.items().forEach(item -> inventoryService.reserveStock(item.productId(), item.quantity()));
+        try {
+            inventoryService.processOrderCreated(event);
+        } catch (InsufficientStockException e) {
+            log.warn("Rejecting stock reservation for order {}: {}", event.orderId(), e.getMessage());
+        }
     }
 }

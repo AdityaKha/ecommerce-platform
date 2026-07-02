@@ -5,13 +5,17 @@ import com.aditya.ecommerce.auth.domain.User;
 import com.aditya.ecommerce.auth.dto.AuthResponse;
 import com.aditya.ecommerce.auth.dto.LoginRequest;
 import com.aditya.ecommerce.auth.dto.RegisterRequest;
+import com.aditya.ecommerce.auth.dto.TokenValidationResponse;
+import com.aditya.ecommerce.auth.dto.UserResponse;
 import com.aditya.ecommerce.auth.repository.UserRepository;
 import com.aditya.ecommerce.auth.security.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -53,5 +57,22 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(user.getUsername(), user.getRoles());
         return new AuthResponse(token, user.getUsername(), jwtUtil.getExpirationMillis());
+    }
+
+    public List<UserResponse> listUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> new UserResponse(user.getId(), user.getUsername(), user.getEmail(),
+                        user.getRoles(), user.getCreatedAt()))
+                .toList();
+    }
+
+    public TokenValidationResponse validate(String token) {
+        if (!jwtUtil.isValid(token)) {
+            return TokenValidationResponse.invalid();
+        }
+        Claims claims = jwtUtil.extractClaims(token);
+        @SuppressWarnings("unchecked")
+        List<String> roles = claims.get("roles", List.class);
+        return new TokenValidationResponse(true, claims.getSubject(), Set.copyOf(roles));
     }
 }

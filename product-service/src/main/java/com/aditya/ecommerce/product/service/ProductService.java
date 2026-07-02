@@ -4,9 +4,12 @@ import com.aditya.ecommerce.product.domain.Product;
 import com.aditya.ecommerce.product.dto.ProductRequest;
 import com.aditya.ecommerce.product.dto.ProductResponse;
 import com.aditya.ecommerce.product.repository.ProductRepository;
+import com.aditya.ecommerce.product.repository.ProductSpecifications;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -22,6 +25,16 @@ public class ProductService {
 
     public ProductResponse findById(Long id) {
         return toResponse(getOrThrow(id));
+    }
+
+    public List<ProductResponse> search(String name, String category, BigDecimal minPrice, BigDecimal maxPrice) {
+        Specification<Product> spec = Specification.allOf(
+                ProductSpecifications.nameContains(name),
+                ProductSpecifications.categoryEquals(category),
+                ProductSpecifications.priceGreaterThanOrEqual(minPrice),
+                ProductSpecifications.priceLessThanOrEqual(maxPrice));
+
+        return productRepository.findAll(spec).stream().map(this::toResponse).toList();
     }
 
     public ProductResponse create(ProductRequest request) {
