@@ -54,8 +54,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for service responsibilities and
 
 ### Day 7 — Notification Service
 - [x] Kafka consumer for `order.created`
-- [ ] Replace log-only stub (`// TODO: integrate with an email/SMS/push provider`) with real **Strategy pattern**: `NotificationStrategy` interface + `EmailStrategy`/`SmsStrategy`/`PushStrategy`, selected at runtime
-- [ ] Wire an actual email provider (e.g. SMTP/SendGrid sandbox) for at least one strategy end-to-end
+- [x] Replace log-only stub with real **Strategy pattern**: `NotificationStrategy` interface + `EmailNotificationStrategy`/`SmsNotificationStrategy`/`PushNotificationStrategy`, selected at runtime via `notification.channel` config (defaults to `EMAIL`)
+- [x] Wire an actual email provider end-to-end — `EmailNotificationStrategy` sends real SMTP mail via `JavaMailSender` (`spring-boot-starter-mail`), config'd via `MAIL_HOST`/`MAIL_PORT`/`MAIL_USERNAME`/`MAIL_PASSWORD` env vars (defaults to a local dev SMTP catcher on `localhost:1025`); `order-service` now carries an optional `customerEmail` through `OrderRequest` → `Order` → `order.created` event so notification-service has a real recipient. SMS/Push strategies remain log-only stubs behind the same interface. Verified with a GreenMail-backed test that asserts a real message is delivered over SMTP.
 
 ### Day 8 — Angular UI: Cart & Checkout
 - [x] Standalone components: `HomeComponent`, `LoginComponent`, `RegisterComponent`, `ProductListComponent`

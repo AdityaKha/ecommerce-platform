@@ -56,6 +56,10 @@ Schema is managed automatically by Hibernate (`ddl-auto: update`) on first start
 | `JWT_SECRET` | Yes | `change-this-to-a-long-random-secret-key-min-32-bytes` | Shared JWT signing secret — **must be overridden in production** |
 | `SPRING_DATASOURCE_USERNAME` | No | `postgres` | PostgreSQL username |
 | `SPRING_DATASOURCE_PASSWORD` | No | `postgres` | PostgreSQL password |
+| `MAIL_HOST` | No | `localhost` | SMTP host used by `notification-service` for order confirmation emails |
+| `MAIL_PORT` | No | `1025` | SMTP port — defaults to a local dev SMTP catcher (e.g. [MailHog](https://github.com/mailhog/MailHog)/[Mailpit](https://github.com/axllent/mailpit)) so you can inspect sent mail without a real provider |
+| `MAIL_USERNAME` / `MAIL_PASSWORD` | No | *(empty)* | SMTP credentials — set these along with `MAIL_HOST`/`MAIL_PORT` when pointing at a real provider (SendGrid, SES, etc.) |
+| `NOTIFICATION_CHANNEL` | No | `EMAIL` | Which `NotificationStrategy` (`EMAIL`, `SMS`, `PUSH`) handles order confirmations |
 
 Set `JWT_SECRET` before starting `api-gateway` and `auth-service`:
 

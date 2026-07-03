@@ -12,6 +12,26 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: com.aditya.ecommerce.notification.event
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:false}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:false}
+
+# For local development, point this at a disposable SMTP catcher (e.g. MailHog/Mailpit
+# on localhost:1025) so sent mail can be inspected without a real provider. In
+# production, override via MAIL_HOST/MAIL_PORT/MAIL_USERNAME/MAIL_PASSWORD env vars
+# for a real SMTP provider (SendGrid, SES, etc.) — never hardcode credentials here.
+notification:
+  channel: ${NOTIFICATION_CHANNEL:EMAIL}
+  mail:
+    from: ${NOTIFICATION_MAIL_FROM:no-reply@ecommerce-platform.local}
 
 eureka:
   client:

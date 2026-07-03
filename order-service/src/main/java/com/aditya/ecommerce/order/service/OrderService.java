@@ -58,6 +58,7 @@ public class OrderService {
 
         Order order = Order.builder()
                 .customerUsername(request.customerUsername())
+                .customerEmail(request.customerEmail())
                 .status(OrderStatus.CREATED)
                 .totalAmount(total)
                 .items(items)
@@ -70,6 +71,7 @@ public class OrderService {
         orderEventProducer.publishOrderCreated(new OrderCreatedEvent(
                 saved.getId(),
                 saved.getCustomerUsername(),
+                saved.getCustomerEmail(),
                 saved.getItems().stream()
                         .map(i -> new OrderCreatedEvent.Item(i.getProductId(), i.getQuantity()))
                         .toList(),
@@ -109,6 +111,7 @@ public class OrderService {
         return new OrderResponse(
                 order.getId(),
                 order.getCustomerUsername(),
+                order.getCustomerEmail(),
                 order.getStatus(),
                 order.getTotalAmount(),
                 items,

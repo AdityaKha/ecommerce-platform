@@ -10,6 +10,7 @@ import java.util.List;
 public record OrderCreatedEvent(
         Long orderId,
         String customerUsername,
+        String customerEmail,
         List<Item> items,
         BigDecimal totalAmount
 ) {
