@@ -17,6 +17,8 @@ import { AuthService } from '../../core/services/auth.service';
         </mat-card-header>
         <mat-card-actions>
           <button mat-stroked-button color="primary" routerLink="/products">View Products</button>
+          <button mat-stroked-button routerLink="/cart">Cart</button>
+          <button mat-stroked-button routerLink="/orders">My Orders</button>
           <button mat-stroked-button color="warn" (click)="logout()">Sign Out</button>
         </mat-card-actions>
       </mat-card>

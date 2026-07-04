@@ -1,15 +1,21 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import { Product } from '../../../core/models/product.models';
 import { ProductService } from '../../../core/services/product.service';
+import { CartService } from '../../../core/services/cart.service';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, MatButtonModule],
   template: `
     <div class="product-list-container">
-      <h2>Products</h2>
+      <div class="product-list-header">
+        <h2>Products</h2>
+        <a routerLink="/cart">Cart ({{ cartService.itemCount() }})</a>
+      </div>
 
       @if (loading()) {
         <p>Loading products...</p>
@@ -25,6 +31,7 @@ import { ProductService } from '../../../core/services/product.service';
               <th>SKU</th>
               <th>Category</th>
               <th>Price</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -34,6 +41,11 @@ import { ProductService } from '../../../core/services/product.service';
                 <td>{{ product.sku }}</td>
                 <td>{{ product.category }}</td>
                 <td>{{ product.price | currency }}</td>
+                <td>
+                  <button mat-stroked-button color="primary" (click)="cartService.add(product)">
+                    Add to Cart
+                  </button>
+                </td>
               </tr>
             }
           </tbody>
@@ -46,6 +58,11 @@ import { ProductService } from '../../../core/services/product.service';
       max-width: 720px;
       margin: 32px auto;
       padding: 0 16px;
+    }
+    .product-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .product-table {
       width: 100%;
@@ -66,7 +83,10 @@ export class ProductListComponent implements OnInit {
   loading = signal(false);
   errorMessage = signal('');
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    protected cartService: CartService,
+  ) {}
 
   ngOnInit(): void {
     this.loading.set(true);

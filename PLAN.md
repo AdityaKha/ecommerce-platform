@@ -60,10 +60,10 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for service responsibilities and
 ### Day 8 — Angular UI: Cart & Checkout
 - [x] Standalone components: `HomeComponent`, `LoginComponent`, `RegisterComponent`, `ProductListComponent`
 - [x] `AuthService`, `ProductService`, JWT `auth.interceptor.ts`
-- [ ] Route guards on `/products`, `/orders`, `/home` (currently unauthenticated users can hit protected routes client-side)
-- [ ] Cart component (add/remove/update quantity, local state)
-- [ ] Checkout flow calling `POST /api/orders`
-- [ ] Order history page calling `GET /api/orders`
+- [x] Route guards on `/products`, `/orders`, `/home` (and `/cart`, `/checkout`) — functional `authGuard` redirects unauthenticated users to `/auth/login`
+- [x] Cart component (add/remove/update quantity, local state) — signal-based `CartService`, wired into `ProductListComponent` ("Add to Cart") and a new `CartComponent`
+- [x] Checkout flow calling `POST /api/orders` — `CheckoutComponent` + `OrderService`, builds `OrderRequest` from cart state, clears cart and redirects to `/orders` on success
+- [x] Order history page calling `GET /api/orders` — `OrderHistoryComponent`, filters the full order list client-side by the signed-in username (no user-scoped query param exists on the backend yet)
 
 ---
 
