@@ -70,9 +70,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for service responsibilities and
 ## Phase 2 — Data & Quality (Days 9–11)
 
 ### Day 9 — Database Migrations
-- [ ] Add Flyway to all 4 DB-backed services (auth, product, order, inventory)
-- [ ] Write baseline `V1__init.sql` per service capturing the current Hibernate-generated schema
-- [ ] Flip `ddl-auto` from `update` to `validate` once migrations are in place
+- [x] Add Flyway to all 4 DB-backed services (auth, product, order, inventory) — `flyway-core` + `flyway-database-postgresql`
+- [x] Write baseline `V1__init.sql` per service capturing the current Hibernate-generated schema
+- [x] Flip `ddl-auto` from `update` to `validate` once migrations are in place — `spring.flyway.baseline-on-migrate: true` added so pre-existing local dev DBs baseline at `V1` rather than failing on already-present tables
 
 ### Day 10 — Testing: Unit & Integration
 - [ ] Unit tests for service/domain logic in each of the 7 services (JUnit 5 + Mockito)
