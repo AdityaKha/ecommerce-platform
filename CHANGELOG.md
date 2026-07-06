@@ -23,12 +23,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `angular-ui`: `CheckoutComponent` (`/checkout`) and `OrderService`, submitting cart contents as an `OrderRequest` to `POST /api/orders`; clears the cart and redirects to order history on success.
 - `angular-ui`: `OrderHistoryComponent` (`/orders`) listing the signed-in user's past orders via `GET /api/orders`.
 - Flyway database migrations for `auth-service`, `product-service`, `order-service`, and `inventory-service`: baseline `V1__init.sql` per service capturing the current Hibernate-generated schema (`users`/`user_roles`, `products`, `orders`/`order_items`, `inventory_items`/`processed_order_events`); `spring.jpa.hibernate.ddl-auto` flipped from `update` to `validate` in all four, with `spring.flyway.baseline-on-migrate: true` so existing dev databases (already schema'd via `ddl-auto: update`) baseline at `V1` instead of failing.
+- JUnit5/Mockito unit tests for domain/service logic across all 7 backend services (auth, product, order, inventory, notification, gateway filters, and a discovery-server context-load smoke test).
+- Testcontainers-backed integration tests (`*IT.java`, run via `mvn verify`, Failsafe-bound) for the Postgres-backed repository layers in `auth-service`, `product-service`, `order-service`, and `inventory-service`, plus real Kafka producer/consumer coverage for the `order-events` topic (`order-service` → `inventory-service`).
+- Angular unit tests (Jasmine/Karma) for `AuthService`, `ProductService`, `CartService`, `CartComponent`, `CheckoutComponent`, and `OrderHistoryComponent`.
+- Local `pre-push` git hook (`.githooks/pre-push`, enabled via `git config core.hooksPath .githooks`) running `mvn test` and `ng test` before every push.
 
 ### Planned
 - Inter-service Kafka/RabbitMQ event bus wiring.
 - Docker Compose setup for local development.
 - JWT validation filter in `api-gateway`.
-- Unit and integration test suites per service.
 
 ---
 

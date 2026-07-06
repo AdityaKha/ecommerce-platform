@@ -31,8 +31,28 @@ mvn -DskipTests package -pl auth-service
 # Run tests
 mvn test
 
+# Run tests for one service
+mvn test -pl auth-service -am
+
+# Run Testcontainers-backed integration tests (requires Docker running)
+mvn verify
+
+# Run Angular unit tests
+cd angular-ui && npm test -- --watch=false --browsers=ChromeHeadless
+
 # Run a single service locally
 mvn spring-boot:run -pl auth-service
+```
+
+`mvn test` runs only fast unit tests (Surefire, `*Test.java`, no Docker needed).
+Testcontainers-based repository/Kafka integration tests are named `*IT.java`
+and only run under `mvn verify` (Failsafe), since they need Docker.
+
+A local pre-push hook runs both `mvn test` and the Angular test suite. Enable
+it once per clone with:
+
+```bash
+git config core.hooksPath .githooks
 ```
 
 ## Safety & Constraints

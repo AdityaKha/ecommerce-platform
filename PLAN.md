@@ -75,10 +75,10 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for service responsibilities and
 - [x] Flip `ddl-auto` from `update` to `validate` once migrations are in place — `spring.flyway.baseline-on-migrate: true` added so pre-existing local dev DBs baseline at `V1` rather than failing on already-present tables
 
 ### Day 10 — Testing: Unit & Integration
-- [ ] Unit tests for service/domain logic in each of the 7 services (JUnit 5 + Mockito)
-- [ ] Testcontainers-based integration tests for repository layers (Postgres) and Kafka producers/consumers
-- [ ] Angular unit tests for `AuthService`, `ProductService`, and the new cart/checkout components
-- [ ] Wire `mvn test` and `ng test` into a local pre-push check
+- [x] Unit tests for service/domain logic in each of the 7 services (JUnit 5 + Mockito) — plain Mockito, no Spring context, matching the Day-7 `NotificationServiceTest` pattern; `discovery-server` gets a context-load smoke test since it has no domain logic of its own
+- [x] Testcontainers-based integration tests for repository layers (Postgres) and Kafka producers/consumers — `*IT.java` (Failsafe, `mvn verify`) for `auth-service`/`product-service`/`order-service`/`inventory-service` repositories, plus a real producer→consumer Kafka path (`order-service` → `inventory-service`) over Testcontainers Kafka
+- [x] Angular unit tests for `AuthService`, `ProductService`, and the new cart/checkout components — plus `CartService` and `OrderHistoryComponent`
+- [x] Wire `mvn test` and `ng test` into a local pre-push check — `.githooks/pre-push`, enabled via `git config core.hooksPath .githooks`
 
 ### Day 11 — Contract Tests & Resilience
 - [ ] Spring Cloud Contract (or equivalent) between order-service ↔ inventory-service
