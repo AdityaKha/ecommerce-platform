@@ -90,9 +90,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for service responsibilities and
 ## Phase 3 — Operability (Days 12–14)
 
 ### Day 12 — Observability
-- [ ] Enable `/actuator/health` and `/actuator/info` on all 7 services (none currently expose Actuator)
-- [ ] Structured JSON logging (Logback) with `traceId`/`spanId`
-- [ ] OpenTelemetry + Jaeger wiring for distributed tracing across gateway → services
+- [x] Enable `/actuator/health` and `/actuator/info` on all 7 services (the starter was already on every classpath; exposure config + `info.app` payload added per service)
+- [x] Structured JSON logging (Logback) with `traceId`/`spanId` — Boot 3.5 native ECS structured logging behind a `json-logs` profile; default console output keeps human-readable lines with `[app,traceId,spanId]` correlation
+- [x] OpenTelemetry + Jaeger wiring for distributed tracing across gateway → services — `micrometer-tracing-bridge-otel` + OTLP/HTTP exporter on the 6 request-path services (discovery-server intentionally untraced), Kafka hops included via producer/listener observations; order-service's `RestClient.Builder` fixed to go through `RestClientBuilderConfigurer` so order→inventory calls propagate context
 
 ### Day 13 — Containerization
 - [ ] Dockerfile per service (7 total) — none exist today

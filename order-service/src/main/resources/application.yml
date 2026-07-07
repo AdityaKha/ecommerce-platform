@@ -20,6 +20,10 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    template:
+      # Propagate the current trace into produced records (traceparent header)
+      # so consumers continue the same trace.
+      observation-enabled: true
 
 eureka:
   client:
@@ -45,3 +49,38 @@ resilience4j:
     instances:
       inventory:
         timeout-duration: 3s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  info:
+    env:
+      enabled: true
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:1.0}
+  otlp:
+    tracing:
+      endpoint: ${OTLP_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
+
+info:
+  app:
+    name: order-service
+    description: Order placement and order lifecycle; publishes OrderCreated events to Kafka
+
+---
+# Structured JSON logging: one ECS document per line, traceId/spanId included
+# as fields. Activate with SPRING_PROFILES_ACTIVE=json-logs (e.g. in
+# containers); the default profile keeps human-readable console output, which
+# already carries [app,traceId,spanId] correlation while tracing is active.
+spring:
+  config:
+    activate:
+      on-profile: json-logs
+
+logging:
+  structured:
+    format:
+      console: ecs

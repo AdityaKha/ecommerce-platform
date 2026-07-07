@@ -13,3 +13,33 @@ eureka:
     fetch-registry: false
     service-url:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+
+# No distributed tracing here: the registry sits outside every request path
+# and its constant heartbeat traffic would only add span noise in Jaeger.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: discovery-server
+    description: Eureka service registry for the ecommerce platform
+
+---
+# Structured JSON logging: one ECS document per line. Activate with
+# SPRING_PROFILES_ACTIVE=json-logs (e.g. in containers); the default profile
+# keeps human-readable console output.
+spring:
+  config:
+    activate:
+      on-profile: json-logs
+
+logging:
+  structured:
+    format:
+      console: ecs

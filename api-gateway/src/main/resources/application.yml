@@ -64,6 +64,26 @@ eureka:
 jwt:
   secret: ${JWT_SECRET:change-this-to-a-long-random-secret-key-min-32-bytes}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  info:
+    env:
+      enabled: true
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:1.0}
+  otlp:
+    tracing:
+      endpoint: ${OTLP_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
+
+info:
+  app:
+    name: api-gateway
+    description: Edge router and JWT enforcement point for the ecommerce platform
+
 # Circuit breakers for all routes: after 50% of the last 10 calls fail, the
 # circuit opens for 10s and requests short-circuit to /fallback (503) instead
 # of waiting on a struggling downstream. The time limiter must stay >= the
@@ -82,3 +102,18 @@ resilience4j:
     configs:
       default:
         timeout-duration: 6s
+
+---
+# Structured JSON logging: one ECS document per line, traceId/spanId included
+# as fields. Activate with SPRING_PROFILES_ACTIVE=json-logs (e.g. in
+# containers); the default profile keeps human-readable console output, which
+# already carries [app,traceId,spanId] correlation while tracing is active.
+spring:
+  config:
+    activate:
+      on-profile: json-logs
+
+logging:
+  structured:
+    format:
+      console: ecs

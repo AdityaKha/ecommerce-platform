@@ -60,6 +60,9 @@ Schema is managed automatically by Hibernate (`ddl-auto: update`) on first start
 | `MAIL_PORT` | No | `1025` | SMTP port — defaults to a local dev SMTP catcher (e.g. [MailHog](https://github.com/mailhog/MailHog)/[Mailpit](https://github.com/axllent/mailpit)) so you can inspect sent mail without a real provider |
 | `MAIL_USERNAME` / `MAIL_PASSWORD` | No | *(empty)* | SMTP credentials — set these along with `MAIL_HOST`/`MAIL_PORT` when pointing at a real provider (SendGrid, SES, etc.) |
 | `NOTIFICATION_CHANNEL` | No | `EMAIL` | Which `NotificationStrategy` (`EMAIL`, `SMS`, `PUSH`) handles order confirmations |
+| `OTLP_TRACING_ENDPOINT` | No | `http://localhost:4318/v1/traces` | OTLP/HTTP endpoint traces are exported to (e.g. a Jaeger collector) |
+| `TRACING_SAMPLING_PROBABILITY` | No | `1.0` | Fraction of requests traced — keep `1.0` locally, lower it in production |
+| `SPRING_PROFILES_ACTIVE` | No | *(none)* | Set to `json-logs` for structured ECS-JSON console logging instead of human-readable output |
 
 Set `JWT_SECRET` before starting `api-gateway` and `auth-service`:
 
@@ -131,3 +134,47 @@ All requests go through the gateway at `http://localhost:8080`:
 | `/api/products/**` | `product-service` |
 | `/api/orders/**` | `order-service` |
 | `/api/inventory/**` | `inventory-service` |
+
+---
+
+## Observability
+
+### Health & info endpoints
+
+Every service exposes `GET /actuator/health` and `GET /actuator/info` on its own
+port (they are not routed through the gateway), e.g.
+`http://localhost:8083/actuator/health` for `order-service`. Health aggregates
+each service's real dependencies — DB, mail server — so a service reports
+`DOWN` (HTTP 503) when a dependency it needs is unreachable.
+
+### Structured JSON logging
+
+By default services log human-readable lines that include
+`[application,traceId,spanId]` correlation. For machine-ingestible output
+(one [ECS](https://www.elastic.co/guide/en/ecs/current/index.html) JSON
+document per line, with `traceId`/`spanId` as fields), activate the
+`json-logs` profile:
+
+```bash
+SPRING_PROFILES_ACTIVE=json-logs mvn spring-boot:run -pl order-service
+```
+
+### Distributed tracing (OpenTelemetry → Jaeger)
+
+All request-path services (gateway, auth, product, order, inventory,
+notification) trace with Micrometer Tracing over the OpenTelemetry bridge and
+export spans via OTLP/HTTP. Traces propagate end-to-end: gateway → service
+HTTP hops (W3C `traceparent` header) and across Kafka (`order.created` →
+inventory/notification consumers). `discovery-server` is deliberately not
+traced — registry heartbeats would only add noise.
+
+Start Jaeger locally (UI on `http://localhost:16686`, OTLP on `4318`):
+
+```bash
+docker run --rm -d --name jaeger -p 16686:16686 -p 4318:4318 jaegertracing/all-in-one:1.57
+```
+
+No configuration needed — services export to `localhost:4318` by default
+(override with `OTLP_TRACING_ENDPOINT`). Every request is sampled by default;
+tune with `TRACING_SAMPLING_PROBABILITY`. If no collector is running, services
+work normally and just log periodic span-export warnings.

@@ -31,9 +31,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Resilience4j circuit breakers on all four `api-gateway` routes (`CircuitBreaker` filter per route, 50% failure rate over a 10-call window opens the circuit for 10s) with a shared `/fallback` endpoint returning a uniform 503 JSON body.
 - `order-service`: the synchronous inventory-availability check in `InventoryClient` is now wrapped in a Resilience4j circuit breaker (`inventory`); when inventory-service is unreachable or the circuit is open, order creation fails fast with 503 (`InventoryUnavailableException`) instead of 500. The inventory base URL is now externalized as `inventory.service.url`.
 - Kafka consumer retry with exponential backoff (1s initial, ×2, max 10s, 4 retries) in `inventory-service` and `notification-service` via a `DefaultErrorHandler` bean; non-recoverable business failures (insufficient stock, missing inventory record) are dropped after a single attempt instead of being redelivered.
+- Actuator `GET /actuator/health` and `GET /actuator/info` exposed on all 7 services, with an `info.app` payload (name + description) per service.
+- Structured JSON logging via Spring Boot's native ECS format, activated by the new `json-logs` profile (`SPRING_PROFILES_ACTIVE=json-logs`); default console output now carries `[application,traceId,spanId]` correlation on every line.
+- Distributed tracing with Micrometer Tracing + OpenTelemetry (`micrometer-tracing-bridge-otel`, `opentelemetry-exporter-otlp`) on the 6 request-path services, exporting OTLP/HTTP to Jaeger (`OTLP_TRACING_ENDPOINT`, default `http://localhost:4318/v1/traces`; sampling via `TRACING_SAMPLING_PROBABILITY`, default 1.0). Traces propagate gateway → services over W3C `traceparent` and across Kafka via producer/listener observations (`spring.kafka.template.observation-enabled` in `order-service`, `spring.kafka.listener.observation-enabled` in `inventory-service`/`notification-service`). `discovery-server` is intentionally untraced to avoid heartbeat span noise.
 
 ### Changed
 - `order-service`: downstream inventory failures during order creation now return 503 with a "retry later" message instead of propagating a 500.
+
+### Fixed
+- `order-service`: the load-balanced `RestClient.Builder` is now built through `RestClientBuilderConfigurer`, so Boot's observation instrumentation applies to `InventoryClient` calls — without this, order → inventory HTTP hops would neither create client spans nor propagate the trace context.
 
 ### Planned
 - Inter-service Kafka/RabbitMQ event bus wiring.
