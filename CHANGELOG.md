@@ -27,6 +27,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Testcontainers-backed integration tests (`*IT.java`, run via `mvn verify`, Failsafe-bound) for the Postgres-backed repository layers in `auth-service`, `product-service`, `order-service`, and `inventory-service`, plus real Kafka producer/consumer coverage for the `order-events` topic (`order-service` → `inventory-service`).
 - Angular unit tests (Jasmine/Karma) for `AuthService`, `ProductService`, `CartService`, `CartComponent`, `CheckoutComponent`, and `OrderHistoryComponent`.
 - Local `pre-push` git hook (`.githooks/pre-push`, enabled via `git config core.hooksPath .githooks`) running `mvn test` and `ng test` before every push.
+- Spring Cloud Contract tests for the `order-service` ↔ `inventory-service` HTTP contract (`GET /api/inventory/{productId}`, 200 and 404 cases): producer-side verification tests generated from YAML contracts in `inventory-service/src/test/resources/contracts`, and a consumer-side stub-runner test in `order-service` running `InventoryClient` against WireMock stubs generated from those same contracts at runtime (no stub jar installation needed).
+- Resilience4j circuit breakers on all four `api-gateway` routes (`CircuitBreaker` filter per route, 50% failure rate over a 10-call window opens the circuit for 10s) with a shared `/fallback` endpoint returning a uniform 503 JSON body.
+- `order-service`: the synchronous inventory-availability check in `InventoryClient` is now wrapped in a Resilience4j circuit breaker (`inventory`); when inventory-service is unreachable or the circuit is open, order creation fails fast with 503 (`InventoryUnavailableException`) instead of 500. The inventory base URL is now externalized as `inventory.service.url`.
+- Kafka consumer retry with exponential backoff (1s initial, ×2, max 10s, 4 retries) in `inventory-service` and `notification-service` via a `DefaultErrorHandler` bean; non-recoverable business failures (insufficient stock, missing inventory record) are dropped after a single attempt instead of being redelivered.
+
+### Changed
+- `order-service`: downstream inventory failures during order creation now return 503 with a "retry later" message instead of propagating a 500.
 
 ### Planned
 - Inter-service Kafka/RabbitMQ event bus wiring.

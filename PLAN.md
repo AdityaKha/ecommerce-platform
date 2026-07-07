@@ -81,9 +81,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for service responsibilities and
 - [x] Wire `mvn test` and `ng test` into a local pre-push check — `.githooks/pre-push`, enabled via `git config core.hooksPath .githooks`
 
 ### Day 11 — Contract Tests & Resilience
-- [ ] Spring Cloud Contract (or equivalent) between order-service ↔ inventory-service
-- [ ] Resilience4j circuit breakers on gateway→service and order→inventory calls
-- [ ] Retry/backoff policy for Kafka consumers on transient failures
+- [x] Spring Cloud Contract (or equivalent) between order-service ↔ inventory-service — YAML contracts in `inventory-service/src/test/resources/contracts` drive both plugin-generated producer verification tests (inventory-service) and a consumer-side stub-runner test (`InventoryClientContractTest`, order-service) that generates WireMock stubs from the contracts at runtime, so `mvn test` covers both sides without installing stub jars
+- [x] Resilience4j circuit breakers on gateway→service and order→inventory calls — per-route `CircuitBreaker` filters in api-gateway with a shared 503 `/fallback`, and a Spring Cloud CircuitBreaker wrapper in `InventoryClient` mapping open-circuit/unreachable to 503 `InventoryUnavailableException`
+- [x] Retry/backoff policy for Kafka consumers on transient failures — `DefaultErrorHandler` with `ExponentialBackOffWithMaxRetries` (1s ×2 up to 10s, 4 retries) in inventory- and notification-service; insufficient-stock / missing-record failures classified not-retryable (log and drop, preserving Day-6 semantics)
 
 ---
 

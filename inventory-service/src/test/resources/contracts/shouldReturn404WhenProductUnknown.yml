@@ -1,0 +1,13 @@
+description: |
+  GET /api/inventory/{productId} for a product without an inventory record
+  returns 404 with an error message. order-service treats this as
+  "insufficient stock" rather than a transient failure.
+request:
+  method: GET
+  url: /api/inventory/999
+response:
+  status: 404
+  headers:
+    Content-Type: application/json
+  body:
+    error: "No inventory record for product: 999"

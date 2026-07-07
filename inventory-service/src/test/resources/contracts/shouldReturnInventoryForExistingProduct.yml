@@ -1,0 +1,15 @@
+description: |
+  GET /api/inventory/{productId} for a product with an inventory record
+  returns 200 with id, productId and quantityAvailable. order-service relies
+  on quantityAvailable to accept or reject new orders.
+request:
+  method: GET
+  url: /api/inventory/1
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    id: 1
+    productId: 1
+    quantityAvailable: 25

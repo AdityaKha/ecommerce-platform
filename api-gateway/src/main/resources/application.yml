@@ -21,18 +21,38 @@ spring:
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: auth-service
+                fallbackUri: forward:/fallback
         - id: product-service
           uri: lb://product-service
           predicates:
             - Path=/api/products/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: product-service
+                fallbackUri: forward:/fallback
         - id: order-service
           uri: lb://order-service
           predicates:
             - Path=/api/orders/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: order-service
+                fallbackUri: forward:/fallback
         - id: inventory-service
           uri: lb://inventory-service
           predicates:
             - Path=/api/inventory/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: inventory-service
+                fallbackUri: forward:/fallback
 
 eureka:
   client:
@@ -43,3 +63,22 @@ eureka:
 
 jwt:
   secret: ${JWT_SECRET:change-this-to-a-long-random-secret-key-min-32-bytes}
+
+# Circuit breakers for all routes: after 50% of the last 10 calls fail, the
+# circuit opens for 10s and requests short-circuit to /fallback (503) instead
+# of waiting on a struggling downstream. The time limiter must stay >= the
+# gateway httpclient response-timeout (5s) so it doesn't cut healthy-but-slow
+# responses short before the underlying client times out.
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 6s

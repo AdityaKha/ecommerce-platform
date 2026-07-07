@@ -68,5 +68,28 @@
             <artifactId>kafka</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-contract-verifier</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Generates producer-side contract verification tests (run by Surefire)
+                 from src/test/resources/contracts, and packages the WireMock stubs
+                 consumed by order-service's stub-runner test. -->
+            <plugin>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-contract-maven-plugin</artifactId>
+                <version>4.3.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <testFramework>JUNIT5</testFramework>
+                    <baseClassForTests>com.aditya.ecommerce.inventory.contracts.InventoryContractBase</baseClassForTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
