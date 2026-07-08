@@ -22,9 +22,31 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for a full architectural overview and [CH
 
 ---
 
-## Prerequisites
+## Quick Start (Docker Compose)
 
-Install and have running before starting any service:
+The fastest way to run the whole platform — no local JDK, Postgres, Kafka, or Node required, only [Docker](https://www.docker.com/):
+
+```bash
+docker compose up --build
+```
+
+First build takes a while (Maven dependencies are downloaded into a build cache); subsequent builds are incremental. Once up:
+
+| URL | What |
+|---|---|
+| http://localhost:4200 | Angular UI |
+| http://localhost:8080 | API gateway (REST entry point) |
+| http://localhost:8761 | Eureka dashboard |
+| http://localhost:8025 | Mailpit — order-confirmation emails land here |
+| http://localhost:16686 | Jaeger — distributed traces |
+
+Postgres is published on host port `15432` and Kafka on `29092` so the stack can run alongside locally installed instances on the default ports. Databases are created automatically ([docker/postgres-init.sql](docker/postgres-init.sql)) and each service applies its own Flyway migrations on startup.
+
+---
+
+## Prerequisites (running services natively)
+
+Install and have running before starting any service outside Docker:
 
 - [JDK 25](https://openjdk.org/)
 - [Maven 3.9+](https://maven.apache.org/)
@@ -45,7 +67,7 @@ CREATE DATABASE orderdb;
 CREATE DATABASE inventorydb;
 ```
 
-Schema is managed automatically by Hibernate (`ddl-auto: update`) on first startup.
+Schema is managed by Flyway migrations (`V1__init.sql` per service), applied automatically on first startup. (When running via Docker Compose, database creation is handled for you.)
 
 ---
 
@@ -54,8 +76,10 @@ Schema is managed automatically by Hibernate (`ddl-auto: update`) on first start
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `JWT_SECRET` | Yes | `change-this-to-a-long-random-secret-key-min-32-bytes` | Shared JWT signing secret — **must be overridden in production** |
-| `SPRING_DATASOURCE_USERNAME` | No | `postgres` | PostgreSQL username |
-| `SPRING_DATASOURCE_PASSWORD` | No | `postgres` | PostgreSQL password |
+| `DB_HOST` / `DB_PORT` | No | `localhost` / `5432` | PostgreSQL host and port (Compose sets `DB_HOST=postgres`) |
+| `DB_USERNAME` / `DB_PASSWORD` | No | `postgres` / `0000` | PostgreSQL credentials — override in production |
+| `KAFKA_BOOTSTRAP_SERVERS` | No | `localhost:9092` | Kafka bootstrap servers (Compose sets `kafka:9092`) |
+| `EUREKA_SERVER_URL` | No | `http://localhost:8761/eureka/` | Eureka registry URL (Compose sets `http://discovery-server:8761/eureka/`) |
 | `MAIL_HOST` | No | `localhost` | SMTP host used by `notification-service` for order confirmation emails |
 | `MAIL_PORT` | No | `1025` | SMTP port — defaults to a local dev SMTP catcher (e.g. [MailHog](https://github.com/mailhog/MailHog)/[Mailpit](https://github.com/axllent/mailpit)) so you can inspect sent mail without a real provider |
 | `MAIL_USERNAME` / `MAIL_PASSWORD` | No | *(empty)* | SMTP credentials — set these along with `MAIL_HOST`/`MAIL_PORT` when pointing at a real provider (SendGrid, SES, etc.) |

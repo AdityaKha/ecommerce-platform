@@ -1,0 +1,11 @@
+# Keep image build contexts small: only POMs and src/ are needed by the service
+# Dockerfiles; angular-ui has its own context and .dockerignore.
+.git
+.githooks
+.idea
+.vscode
+**/target
+angular-ui/node_modules
+angular-ui/dist
+angular-ui/.angular
+*.md

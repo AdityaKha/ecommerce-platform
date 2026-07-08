@@ -85,6 +85,10 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
             <!-- Generates producer-side contract verification tests (run by Surefire)
                  from src/test/resources/contracts, and packages the WireMock stubs
                  consumed by order-service's stub-runner test. -->

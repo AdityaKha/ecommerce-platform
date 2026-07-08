@@ -5,9 +5,9 @@ spring:
   application:
     name: product-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/productdb
-    username: postgres
-    password: "0000"
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/productdb
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:0000}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -19,7 +19,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
   instance:
     prefer-ip-address: true
 

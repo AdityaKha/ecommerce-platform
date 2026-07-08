@@ -95,9 +95,10 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for service responsibilities and
 - [x] OpenTelemetry + Jaeger wiring for distributed tracing across gateway → services — `micrometer-tracing-bridge-otel` + OTLP/HTTP exporter on the 6 request-path services (discovery-server intentionally untraced), Kafka hops included via producer/listener observations; order-service's `RestClient.Builder` fixed to go through `RestClientBuilderConfigurer` so order→inventory calls propagate context
 
 ### Day 13 — Containerization
-- [ ] Dockerfile per service (7 total) — none exist today
-- [ ] Root `docker-compose.yml`: Postgres, Kafka (+ Zookeeper/KRaft), all 7 services, Angular UI
-- [ ] Replace hardcoded `localhost` DB/Kafka hosts in each `application.yml` with env vars for compose networking
+- [x] Dockerfile per service (7 total) — multi-stage (`maven:3.9-eclipse-temurin-25` build → `eclipse-temurin:25-jre` runtime, non-root user, BuildKit `.m2` cache mount), built from the repo root so the parent POM is in context; plus an 8th for `angular-ui` (`node:22-alpine` build → nginx with SPA fallback). Required adding `spring-boot-maven-plugin` to every module — `mvn package` previously produced non-executable thin jars
+- [x] Root `docker-compose.yml`: Postgres 16 (one DB per service via `docker/postgres-init.sql`), Kafka 3.9 single-node KRaft, all 7 services, Angular UI on `:4200` — plus Mailpit (`:8025`) so order emails are inspectable and Jaeger (`:16686`) for the Day-12 tracing; infra host ports shifted (15432/29092) to coexist with native local installs
+- [x] Replace hardcoded `localhost` DB/Kafka hosts in each `application.yml` with env vars for compose networking — `DB_HOST`/`DB_PORT`/`DB_USERNAME`/`DB_PASSWORD`, `KAFKA_BOOTSTRAP_SERVERS`, and `EUREKA_SERVER_URL`, all defaulting to the previous localhost values
+- [x] *(found during compose smoke test)* Fixed cross-service Kafka poison pill: consumers rejected order-service's `__TypeId__` header and looped forever on the record — consumers now use `ErrorHandlingDeserializer` + `spring.json.use.type.headers: false` + local `default.type` (see CHANGELOG). End-to-end verified in the compose stack: register → login → create/stock product → order → stock reserved via Kafka → confirmation email in Mailpit → traces for all 6 services in Jaeger
 
 ### Day 14 — CI Pipeline
 - [ ] `.github/workflows/build.yml`: matrix build + `mvn test` per service on PR

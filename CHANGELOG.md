@@ -35,15 +35,21 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Structured JSON logging via Spring Boot's native ECS format, activated by the new `json-logs` profile (`SPRING_PROFILES_ACTIVE=json-logs`); default console output now carries `[application,traceId,spanId]` correlation on every line.
 - Distributed tracing with Micrometer Tracing + OpenTelemetry (`micrometer-tracing-bridge-otel`, `opentelemetry-exporter-otlp`) on the 6 request-path services, exporting OTLP/HTTP to Jaeger (`OTLP_TRACING_ENDPOINT`, default `http://localhost:4318/v1/traces`; sampling via `TRACING_SAMPLING_PROBABILITY`, default 1.0). Traces propagate gateway → services over W3C `traceparent` and across Kafka via producer/listener observations (`spring.kafka.template.observation-enabled` in `order-service`, `spring.kafka.listener.observation-enabled` in `inventory-service`/`notification-service`). `discovery-server` is intentionally untraced to avoid heartbeat span noise.
 
+- Dockerfiles for all 7 backend services: multi-stage builds (`maven:3.9-eclipse-temurin-25` → `eclipse-temurin:25-jre`) run from the repo root so the parent POM is in context, use a BuildKit `/root/.m2` cache mount, and run as a non-root user.
+- Dockerfile for `angular-ui`: `node:22-alpine` production build served by `nginx:1.27-alpine` with SPA-fallback routing (`nginx.conf`).
+- Root `docker-compose.yml` running the full stack: Postgres 16 (one database per service, created by `docker/postgres-init.sql`), Kafka 3.9 in single-node KRaft mode, Mailpit (SMTP catcher, UI on `:8025`), Jaeger (UI on `:16686`), all 7 services, and the Angular UI on `:4200`. Infra host ports are shifted (`15432`, `29092`) so the stack coexists with locally installed Postgres/Kafka; startup is ordered via healthchecks (`pg_isready`, Kafka API probe, TCP probe on Eureka).
+- `spring-boot-maven-plugin` added to every service module — `mvn package` now produces executable (repackaged) fat jars, which the Dockerfiles rely on; previously only `spring-boot:run` worked.
+
 ### Changed
+- Hardcoded `localhost` infrastructure hosts in each service's `application.yml` are now environment-variable overrides with unchanged local defaults: `DB_HOST`/`DB_PORT`/`DB_USERNAME`/`DB_PASSWORD` (auth/product/order/inventory), `KAFKA_BOOTSTRAP_SERVERS` (order/inventory/notification), and `EUREKA_SERVER_URL` (all 6 Eureka clients) — required for Docker Compose networking.
 - `order-service`: downstream inventory failures during order creation now return 503 with a "retry later" message instead of propagating a 500.
 
 ### Fixed
+- Cross-service Kafka deserialization failure surfaced by the first real containerized run: `order-service` publishes `order.created` with a `__TypeId__` header naming *its* event class, which `inventory-service`/`notification-service` (each with their own event DTO and `spring.json.trusted.packages` limited to their own package) rejected — and since the plain `JsonDeserializer` fails inside `poll()`, the container looped on the record forever without committing (poison pill; stock never reserved, no email sent). Consumers now use `ErrorHandlingDeserializer` → `JsonDeserializer` with `spring.json.use.type.headers: false` and `spring.json.value.default.type` pinned to the local event class, so payloads bind by schema rather than by producer class name and undeserializable records are logged and dropped by the existing `DefaultErrorHandler` instead of wedging the consumer. (The Day-10 Kafka integration test missed this because it produced the event using the consumer's own class, making the type header trusted by construction.)
 - `order-service`: the load-balanced `RestClient.Builder` is now built through `RestClientBuilderConfigurer`, so Boot's observation instrumentation applies to `InventoryClient` calls — without this, order → inventory HTTP hops would neither create client spans nor propagate the trace context.
 
 ### Planned
 - Inter-service Kafka/RabbitMQ event bus wiring.
-- Docker Compose setup for local development.
 - JWT validation filter in `api-gateway`.
 
 ---
