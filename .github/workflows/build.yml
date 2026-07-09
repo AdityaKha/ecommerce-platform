@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - discovery-server
+          - api-gateway
+          - auth-service
+          - product-service
+          - order-service
+          - inventory-service
+          - notification-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      # Unit tests only (Surefire); Testcontainers ITs (*IT.java) need Docker
+      # and stay behind `mvn verify`, mirroring the local pre-push hook.
+      - name: Build and test ${{ matrix.service }}
+        run: mvn -B test -pl ${{ matrix.service }} -am

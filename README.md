@@ -1,5 +1,8 @@
 # ecommerce-platform
 
+[![Build](https://github.com/AdityaKha/ecommerce-platform/actions/workflows/build.yml/badge.svg)](https://github.com/AdityaKha/ecommerce-platform/actions/workflows/build.yml)
+[![Angular](https://github.com/AdityaKha/ecommerce-platform/actions/workflows/lint.yml/badge.svg)](https://github.com/AdityaKha/ecommerce-platform/actions/workflows/lint.yml)
+
 A microservices-based e-commerce platform built with Java Spring Boot, Angular, Apache Kafka, and PostgreSQL.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for a full architectural overview and [CHANGELOG.md](CHANGELOG.md) for version history.

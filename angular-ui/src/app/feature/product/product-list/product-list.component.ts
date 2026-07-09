@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -79,14 +79,12 @@ import { CartService } from '../../../core/services/cart.service';
   `],
 })
 export class ProductListComponent implements OnInit {
+  private productService = inject(ProductService);
+  protected cartService = inject(CartService);
+
   products = signal<Product[]>([]);
   loading = signal(false);
   errorMessage = signal('');
-
-  constructor(
-    private productService: ProductService,
-    protected cartService: CartService,
-  ) {}
 
   ngOnInit(): void {
     this.loading.set(true);

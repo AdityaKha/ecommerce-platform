@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -118,20 +118,18 @@ import { AuthService } from '../../core/services/auth.service';
   `],
 })
 export class CheckoutComponent {
+  private fb = inject(FormBuilder);
+  protected cartService = inject(CartService);
+  private orderService = inject(OrderService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   form = this.fb.nonNullable.group({
     customerEmail: ['', [Validators.required, Validators.email]],
   });
 
   loading = false;
   errorMessage = '';
-
-  constructor(
-    private fb: FormBuilder,
-    protected cartService: CartService,
-    private orderService: OrderService,
-    private authService: AuthService,
-    private router: Router,
-  ) {}
 
   onSubmit(): void {
     if (this.form.invalid || this.cartService.items().length === 0) {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -40,9 +40,10 @@ import { AuthService } from '../../core/services/auth.service';
   `],
 })
 export class HomeComponent {
-  username = this.authService.getUsername() ?? 'User';
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(private authService: AuthService, private router: Router) {}
+  username = this.authService.getUsername() ?? 'User';
 
   logout(): void {
     this.authService.logout();

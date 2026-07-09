@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OrderResponse } from '../../core/models/order.models';
@@ -87,14 +87,12 @@ import { AuthService } from '../../core/services/auth.service';
   `],
 })
 export class OrderHistoryComponent implements OnInit {
+  private orderService = inject(OrderService);
+  private authService = inject(AuthService);
+
   orders = signal<OrderResponse[]>([]);
   loading = signal(false);
   errorMessage = signal('');
-
-  constructor(
-    private orderService: OrderService,
-    private authService: AuthService,
-  ) {}
 
   ngOnInit(): void {
     this.loading.set(true);

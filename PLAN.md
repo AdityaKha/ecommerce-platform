@@ -101,9 +101,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for service responsibilities and
 - [x] *(found during compose smoke test)* Fixed cross-service Kafka poison pill: consumers rejected order-service's `__TypeId__` header and looped forever on the record — consumers now use `ErrorHandlingDeserializer` + `spring.json.use.type.headers: false` + local `default.type` (see CHANGELOG). End-to-end verified in the compose stack: register → login → create/stock product → order → stock reserved via Kafka → confirmation email in Mailpit → traces for all 6 services in Jaeger
 
 ### Day 14 — CI Pipeline
-- [ ] `.github/workflows/build.yml`: matrix build + `mvn test` per service on PR
-- [ ] `.github/workflows/lint.yml`: Angular lint/test on PR
-- [ ] Fail PRs on test failure; publish build status badge in `README.md`
+- [x] `.github/workflows/build.yml`: matrix build + `mvn test` per service on PR — 7-way service matrix (`mvn -B test -pl <service> -am`, Temurin 25, Maven cache); unit tests only, Testcontainers ITs stay local behind `mvn verify` since they need Docker
+- [x] `.github/workflows/lint.yml`: Angular lint/test on PR — required adding lint to the UI first: `ng add angular-eslint` + the `@angular/core:inject` migration schematic to fix the 21 resulting `prefer-inject` errors (all 46 UI tests still green)
+- [x] Fail PRs on test failure; publish build status badge in `README.md` — both workflows fail their check on any test/lint failure and also run on `main` pushes so the two README badges stay live; to make the checks merge-blocking, enable branch protection on `main` requiring the `Build` and `Angular` checks (GitHub settings, can't be done from the repo)
 
 ---
 

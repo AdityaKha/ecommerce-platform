@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -83,7 +83,8 @@ import { CartService } from '../../core/services/cart.service';
   `],
 })
 export class CartComponent {
-  constructor(protected cartService: CartService) {}
+  protected cartService = inject(CartService);
+
 
   increment(productId: number, quantity: number): void {
     this.cartService.updateQuantity(productId, quantity + 1);

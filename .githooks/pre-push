@@ -9,6 +9,9 @@ repo_root="$(git rev-parse --show-toplevel)"
 echo "==> Running backend unit tests (mvn test)"
 (cd "$repo_root" && mvn -q test)
 
+echo "==> Running Angular lint (ng lint)"
+(cd "$repo_root/angular-ui" && npm run lint)
+
 echo "==> Running Angular unit tests (ng test)"
 if [ -z "$CHROME_BIN" ]; then
   edge="/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
