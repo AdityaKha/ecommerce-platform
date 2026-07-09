@@ -28,6 +28,53 @@ body {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
+body {
+  background: #f4f6fa;
+  color: #1f2430;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--mat-sys-primary);
+}
+
+// Shared page scaffolding used by feature components
+.page-container {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.page-title {
+  font-size: 26px;
+  margin: 8px 0 20px;
+}
+
+.empty-state {
+  background: #fff;
+  border: 1px dashed #cdd5e0;
+  border-radius: 12px;
+  padding: 40px 24px;
+  text-align: center;
+  color: #5a6472;
+
+  .empty-state-icon {
+    font-size: 44px;
+    width: 44px;
+    height: 44px;
+    color: #9aa7b8;
+  }
+
+  p {
+    margin: 12px 0 16px;
+  }
+}
+
 // Utility classes used across layout components
 .spacer {
   flex: 1 1 auto;

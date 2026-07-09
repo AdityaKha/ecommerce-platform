@@ -4,6 +4,9 @@
 # Angular CLI cache
 .angular/
 
+# Angular build output
+angular-ui/dist/
+
 # Java / Maven build artifacts
 target/
 *.class

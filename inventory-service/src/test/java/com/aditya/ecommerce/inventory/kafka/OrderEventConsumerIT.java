@@ -63,6 +63,11 @@ class OrderEventConsumerIT {
 
     @BeforeEach
     void seedInventory() {
+        // Start from a clean slate: the V2 seed migration also inserts
+        // product_id 1, which would violate the unique constraint here.
+        processedOrderEventRepository.deleteAll();
+        inventoryRepository.deleteAll();
+
         InventoryItem item = InventoryItem.builder()
                 .productId(1L)
                 .quantityAvailable(10)

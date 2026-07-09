@@ -25,14 +25,19 @@ import { AuthService } from '../../core/services/auth.service';
     MatProgressSpinnerModule,
   ],
   template: `
-    <div class="checkout-container">
-      <h2>Checkout</h2>
+    <div class="page-container checkout-container">
+      <h2 class="page-title">Checkout</h2>
 
       @if (cartService.items().length === 0) {
-        <p>Your cart is empty.</p>
-        <a routerLink="/products">Browse products</a>
+        <div class="empty-state">
+          <p>Your cart is empty.</p>
+          <a mat-flat-button routerLink="/products">Browse products</a>
+        </div>
       } @else {
         <mat-card class="summary-card">
+          <mat-card-header>
+            <mat-card-title>Order Summary</mat-card-title>
+          </mat-card-header>
           <mat-card-content>
             @for (item of cartService.items(); track item.product.id) {
               <div class="summary-row">
@@ -82,12 +87,15 @@ import { AuthService } from '../../core/services/auth.service';
   `,
   styles: [`
     .checkout-container {
-      max-width: 480px;
-      margin: 32px auto;
-      padding: 0 16px;
+      max-width: 520px;
     }
     .summary-card {
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      padding: 8px;
+    }
+    .summary-card mat-card-title {
+      font-size: 16px;
+      margin-bottom: 8px;
     }
     .summary-row {
       display: flex;

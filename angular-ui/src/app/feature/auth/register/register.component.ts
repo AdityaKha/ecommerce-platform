@@ -24,6 +24,11 @@ import { AuthService } from '../../../core/services/auth.service';
   ],
   template: `
     <div class="auth-container">
+      <div class="auth-brand">
+        <span class="brand-icon">🛍️</span>
+        <h1>Emporia</h1>
+        <p>Your one-stop shop for everyday essentials</p>
+      </div>
       <mat-card class="auth-card">
         <mat-card-header>
           <mat-card-title>Create Account</mat-card-title>
@@ -92,15 +97,36 @@ import { AuthService } from '../../../core/services/auth.service';
   styles: [`
     .auth-container {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
+      gap: 24px;
       min-height: 100vh;
-      background: #f5f5f5;
+      padding: 24px 16px;
+      background: linear-gradient(150deg, #2c4fa3, #3f6bd8 55%, #7b5cd6);
+    }
+    .auth-brand {
+      text-align: center;
+      color: #fff;
+    }
+    .auth-brand .brand-icon {
+      font-size: 40px;
+    }
+    .auth-brand h1 {
+      margin: 4px 0;
+      font-size: 30px;
+      letter-spacing: 0.5px;
+    }
+    .auth-brand p {
+      margin: 0;
+      opacity: 0.85;
+      font-size: 14px;
     }
     .auth-card {
       width: 100%;
       max-width: 400px;
       padding: 16px;
+      border-radius: 14px;
     }
     .full-width {
       width: 100%;
