@@ -7,7 +7,9 @@ spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/authdb
     username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:0000}
+    # No default on purpose: the service fails fast at startup if DB_PASSWORD
+    # is not provided (see README "Environment Variables").
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -27,8 +29,14 @@ eureka:
     prefer-ip-address: true
 
 jwt:
-  secret: ${JWT_SECRET:change-this-to-a-long-random-secret-key-min-32-bytes}
+  # No default on purpose: must be provided via env (min 32 bytes), shared with api-gateway.
+  secret: ${JWT_SECRET}
   expiration-ms: 3600000
+
+internal:
+  # Shared secret proving a request came through api-gateway (or a trusted
+  # sibling service) rather than directly from the network. No default on purpose.
+  token: ${INTERNAL_TOKEN}
 
 management:
   endpoints:

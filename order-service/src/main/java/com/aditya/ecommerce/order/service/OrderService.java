@@ -90,6 +90,10 @@ public class OrderService {
         return orderRepository.findAll().stream().map(this::toResponse).toList();
     }
 
+    public List<OrderResponse> findByCustomer(String customerUsername) {
+        return orderRepository.findByCustomerUsername(customerUsername).stream().map(this::toResponse).toList();
+    }
+
     public OrderResponse updateStatus(Long id, OrderStatus newStatus) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Order not found: " + id));

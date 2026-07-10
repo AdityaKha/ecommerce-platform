@@ -87,8 +87,10 @@ class InventoryClientContractTest {
         @Bean
         InventoryClient inventoryClient(RestClient.Builder builder,
                                         CircuitBreakerFactory<?, ?> circuitBreakerFactory,
-                                        @Value("${inventory.service.url}") String url) {
-            return new InventoryClient(builder, circuitBreakerFactory, url);
+                                        @Value("${inventory.service.url}") String url,
+                                        @Value("${internal.token}") String internalToken) {
+            // The generated stubs don't match on X-Internal-Token, so any value works.
+            return new InventoryClient(builder, circuitBreakerFactory, url, internalToken);
         }
     }
 }

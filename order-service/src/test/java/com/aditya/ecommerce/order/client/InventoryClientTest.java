@@ -36,7 +36,7 @@ class InventoryClientTest {
     void setUp() {
         RestClient.Builder builder = RestClient.builder();
         mockServer = MockRestServiceServer.bindTo(builder).build();
-        inventoryClient = new InventoryClient(builder, circuitBreakerFactory(), INVENTORY_URL);
+        inventoryClient = new InventoryClient(builder, circuitBreakerFactory(), INVENTORY_URL, "test-internal-token");
     }
 
     /**

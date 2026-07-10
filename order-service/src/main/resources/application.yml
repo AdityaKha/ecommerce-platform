@@ -7,7 +7,9 @@ spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/orderdb
     username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:0000}
+    # No default on purpose: the service fails fast at startup if DB_PASSWORD
+    # is not provided (see README "Environment Variables").
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -35,6 +37,12 @@ eureka:
 inventory:
   service:
     url: http://inventory-service
+
+internal:
+  # Shared secret proving a request came through api-gateway (or a trusted
+  # sibling service) rather than directly from the network; also attached to
+  # outbound order → inventory calls. No default on purpose.
+  token: ${INTERNAL_TOKEN}
 
 resilience4j:
   circuitbreaker:

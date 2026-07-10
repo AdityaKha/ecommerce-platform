@@ -66,9 +66,9 @@ Java-based microservices e-commerce platform built with Spring Boot and Maven. E
 
 ## Security
 
-- JWTs issued by `auth-service`; validated at the gateway via a Spring Cloud Gateway filter.
-- Service-to-service calls secured with mutual TLS or a service mesh (Istio/Linkerd) in production.
-- Secrets managed via environment variables or a secrets manager (Vault / AWS Secrets Manager).
+- JWTs issued by `auth-service`; validated at the gateway via a Spring Cloud Gateway filter. The gateway strips client-supplied identity headers and forwards the verified subject/roles as `X-Auth-Subject`/`X-Auth-Roles`.
+- Service-to-service calls authenticated with a shared secret: the gateway (and internal clients like order→inventory) stamp `X-Internal-Token` on every call, and each service rejects requests without it, so services cannot be reached by bypassing the gateway. Upgrade path for production is mutual TLS or a service mesh (Istio/Linkerd).
+- Secrets managed via environment variables or a secrets manager (Vault / AWS Secrets Manager); `JWT_SECRET`, `INTERNAL_TOKEN`, and `DB_PASSWORD` have no checked-in defaults — services fail fast when they are missing.
 
 ---
 

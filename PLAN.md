@@ -110,9 +110,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for service responsibilities and
 ## Phase 4 — Hardening & Release (Days 15–16)
 
 ### Day 15 — Security Review
-- [ ] Externalize `JWT_SECRET` and DB credentials fully out of `application.yml` defaults (currently placeholder values checked in per README)
-- [ ] Run `/security-review` skill against the full diff since Day 1
-- [ ] Service-to-service auth (mTLS or shared secret) between internal calls, per ARCHITECTURE.md security section
+- [x] Externalize `JWT_SECRET` and DB credentials fully out of `application.yml` defaults — `JWT_SECRET`/`INTERNAL_TOKEN`/`DB_PASSWORD` now have no checked-in fallback anywhere (application.yml or compose); services and Compose (`${VAR:?}`) fail fast if unset. Added `.env.example`; test placeholders in `src/test/resources/application.properties`.
+- [x] Run `/security-review` skill against the full diff since Day 1 — found three HIGH broken-access-control issues (all resource services authenticated but never authorized): order IDOR + PII leak, unauthenticated product catalog writes, unauthenticated inventory stock adjustment. All fixed by reading the gateway-verified `X-Auth-Subject`/`X-Auth-Roles` headers: order endpoints scope/ownership-check by subject and admin, product writes and inventory adjust require `ROLE_ADMIN`. JWT crypto, registration role assignment, and JPA `Specification` search were reviewed and found clean.
+- [x] Service-to-service auth (shared secret) between internal calls, per ARCHITECTURE.md security section — `INTERNAL_TOKEN` / `X-Internal-Token`: gateway stamps it (and strips client-supplied identity/token headers); auth/product/order/inventory reject requests without it via `InternalTokenFilter` (constant-time compare, actuator exempt); `InventoryClient` sends it on order→inventory calls. mTLS/service-mesh noted as the production upgrade path in ARCHITECTURE.md.
 
 ### Day 16 — Deployment
 - [ ] Kubernetes manifests (or chosen platform equivalent) per service, ConfigMaps/Secrets for env config

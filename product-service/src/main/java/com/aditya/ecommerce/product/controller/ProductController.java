@@ -2,6 +2,7 @@ package com.aditya.ecommerce.product.controller;
 
 import com.aditya.ecommerce.product.dto.ProductRequest;
 import com.aditya.ecommerce.product.dto.ProductResponse;
+import com.aditya.ecommerce.product.security.AccessControl;
 import com.aditya.ecommerce.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,18 +39,30 @@ public class ProductController {
         return productService.findById(id);
     }
 
+    // Catalog mutations are admin-only. GETs stay open to any authenticated
+    // user; the gateway-verified role is read from the X-Auth-Roles header.
     @PostMapping
-    public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
+    public ResponseEntity<ProductResponse> create(
+            @Valid @RequestBody ProductRequest request,
+            @RequestHeader(value = AccessControl.ROLES_HEADER, required = false) String roles) {
+        AccessControl.requireAdmin(roles);
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(request));
     }
 
     @PutMapping("/{id}")
-    public ProductResponse update(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+    public ProductResponse update(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductRequest request,
+            @RequestHeader(value = AccessControl.ROLES_HEADER, required = false) String roles) {
+        AccessControl.requireAdmin(roles);
         return productService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @RequestHeader(value = AccessControl.ROLES_HEADER, required = false) String roles) {
+        AccessControl.requireAdmin(roles);
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }

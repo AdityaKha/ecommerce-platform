@@ -27,8 +27,14 @@ public class InventoryClient {
 
     public InventoryClient(RestClient.Builder loadBalancedRestClientBuilder,
                            CircuitBreakerFactory<?, ?> circuitBreakerFactory,
-                           @Value("${inventory.service.url:http://inventory-service}") String inventoryServiceUrl) {
-        this.restClient = loadBalancedRestClientBuilder.baseUrl(inventoryServiceUrl).build();
+                           @Value("${inventory.service.url:http://inventory-service}") String inventoryServiceUrl,
+                           @Value("${internal.token}") String internalToken) {
+        // X-Internal-Token proves to inventory-service that this is a trusted
+        // internal call; without it, direct (non-gateway) requests are rejected.
+        this.restClient = loadBalancedRestClientBuilder
+                .baseUrl(inventoryServiceUrl)
+                .defaultHeader("X-Internal-Token", internalToken)
+                .build();
         this.circuitBreaker = circuitBreakerFactory.create("inventory");
     }
 

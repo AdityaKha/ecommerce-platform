@@ -62,7 +62,14 @@ eureka:
     prefer-ip-address: true
 
 jwt:
-  secret: ${JWT_SECRET:change-this-to-a-long-random-secret-key-min-32-bytes}
+  # No default on purpose: must be provided via env (min 32 bytes), shared with auth-service.
+  secret: ${JWT_SECRET}
+
+internal:
+  # Shared secret stamped on every proxied request (X-Internal-Token) so
+  # downstream services can verify traffic came through the gateway.
+  # No default on purpose.
+  token: ${INTERNAL_TOKEN}
 
 management:
   endpoints:

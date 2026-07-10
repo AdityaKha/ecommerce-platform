@@ -30,8 +30,13 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for a full architectural overview and [CH
 The fastest way to run the whole platform — no local JDK, Postgres, Kafka, or Node required, only [Docker](https://www.docker.com/):
 
 ```bash
+cp .env.example .env   # then fill in JWT_SECRET, INTERNAL_TOKEN, DB_PASSWORD
 docker compose up --build
 ```
+
+Secrets have no checked-in defaults: Compose refuses to start until the three
+values in `.env` are set (the file is gitignored, so they never end up in the
+repo).
 
 First build takes a while (Maven dependencies are downloaded into a build cache); subsequent builds are incremental. Once up:
 
@@ -61,7 +66,7 @@ Install and have running before starting any service outside Docker:
 
 ## Database Setup
 
-Create one database per service in PostgreSQL. The services use `postgres` / `postgres` as the default credentials (override via environment variables in production).
+Create one database per service in PostgreSQL. The username defaults to `postgres` (override with `DB_USERNAME`); the password has no default and must be supplied via `DB_PASSWORD`.
 
 ```sql
 CREATE DATABASE authdb;
@@ -78,9 +83,11 @@ Schema is managed by Flyway migrations (`V1__init.sql` per service), applied aut
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `JWT_SECRET` | Yes | `change-this-to-a-long-random-secret-key-min-32-bytes` | Shared JWT signing secret — **must be overridden in production** |
+| `JWT_SECRET` | **Yes** | *(none — fails fast if unset)* | JWT signing secret (min 32 bytes) shared by `api-gateway` and `auth-service` |
+| `INTERNAL_TOKEN` | **Yes** | *(none — fails fast if unset)* | Service-to-service shared secret: the gateway stamps it on proxied requests as `X-Internal-Token`, and auth/product/order/inventory reject requests without it |
+| `DB_PASSWORD` | **Yes** | *(none — fails fast if unset)* | PostgreSQL password for the four DB-backed services |
 | `DB_HOST` / `DB_PORT` | No | `localhost` / `5432` | PostgreSQL host and port (Compose sets `DB_HOST=postgres`) |
-| `DB_USERNAME` / `DB_PASSWORD` | No | `postgres` / `0000` | PostgreSQL credentials — override in production |
+| `DB_USERNAME` | No | `postgres` | PostgreSQL username |
 | `KAFKA_BOOTSTRAP_SERVERS` | No | `localhost:9092` | Kafka bootstrap servers (Compose sets `kafka:9092`) |
 | `EUREKA_SERVER_URL` | No | `http://localhost:8761/eureka/` | Eureka registry URL (Compose sets `http://discovery-server:8761/eureka/`) |
 | `MAIL_HOST` | No | `localhost` | SMTP host used by `notification-service` for order confirmation emails |
@@ -91,14 +98,18 @@ Schema is managed by Flyway migrations (`V1__init.sql` per service), applied aut
 | `TRACING_SAMPLING_PROBABILITY` | No | `1.0` | Fraction of requests traced — keep `1.0` locally, lower it in production |
 | `SPRING_PROFILES_ACTIVE` | No | *(none)* | Set to `json-logs` for structured ECS-JSON console logging instead of human-readable output |
 
-Set `JWT_SECRET` before starting `api-gateway` and `auth-service`:
+When running services natively (outside Compose), export the required secrets first — services fail fast at startup if they are missing:
 
 ```bash
 # Linux / macOS
 export JWT_SECRET=your-secure-random-secret-min-32-characters
+export INTERNAL_TOKEN=your-secure-random-internal-token
+export DB_PASSWORD=your-postgres-password
 
 # Windows (PowerShell)
 $env:JWT_SECRET = "your-secure-random-secret-min-32-characters"
+$env:INTERNAL_TOKEN = "your-secure-random-internal-token"
+$env:DB_PASSWORD = "your-postgres-password"
 ```
 
 ---
